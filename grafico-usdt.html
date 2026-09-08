@@ -3,17 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>USDT/USDT · Preço em Tempo Real</title>
+<title>USDT · Tether</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0B0E11;--bg2:#171B23;--borda:#2A2F37;--verde:#089981;--vermelho:#F23645;--cinza:#848E9C;--usdt:#26A17B}
+:root{--bg:#0B0E11;--bg2:#171B23;--borda:#2A2F37;--verde:#089981;--cinza:#848E9C;--usdt:#26A17B;--azul:#3B82F6;--dourado:#F59E0B}
 body{background:var(--bg);color:#EAECEF;font-family:sans-serif;padding:16px}
 .container{max-width:1200px;margin:0 auto}
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
 .token-info{display:flex;align-items:center;gap:12px}
-.logo{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
-.logo img{width:26px;height:26px}
-.price-main{font-size:22px;font-weight:700;color:var(--verde)}
+.logo{width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(38,161,123,0.3)}
+.logo img{width:28px;height:28px}
+.price-main{font-size:24px;font-weight:700;color:var(--verde)}
+.saldo-total{background:linear-gradient(135deg,rgba(38,161,123,0.18),rgba(59,130,246,0.12));border:2px solid var(--dourado);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center}
+.saldo-total-titulo{font-size:14px;color:var(--cinza);margin-bottom:8px}
+.saldo-total-valor{font-size:32px;font-weight:700;color:var(--dourado);margin-bottom:4px}
+.carteiras-lista{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:16px;margin-bottom:20px}
+.carteira-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+.carteira-nome{font-size:14px}
+.carteira-end{font-size:11px;color:var(--cinza);font-family:monospace;margin-top:2px;word-break:break-all}
+.carteira-saldo{font-size:16px;font-weight:700;color:var(--usdt)}
 .tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto}
 .tab{padding:6px 12px;border-radius:4px;font-size:13px;background:var(--bg2);color:var(--cinza);white-space:nowrap}
 .time-tabs{display:flex;gap:16px;margin-bottom:16px;border-bottom:1px solid var(--borda)}
@@ -21,8 +29,6 @@ body{background:var(--bg);color:#EAECEF;font-family:sans-serif;padding:16px}
 .time-tab.active{color:var(--verde);border-bottom:2px solid var(--verde)}
 .grafico{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:16px;margin-bottom:16px;height:350px}
 canvas{width:100%!important;height:100%!important}
-.saldo{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:14px;margin-bottom:20px}
-.saldo-valor{font-size:20px;font-weight:700;color:var(--verde)}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
 .card{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:14px}
 .card-label{font-size:12px;color:var(--cinza);margin-bottom:6px}
@@ -31,7 +37,7 @@ canvas{width:100%!important;height:100%!important}
 .endereco-titulo{font-size:12px;color:var(--cinza);margin-bottom:6px}
 .endereco-valor{font-size:12px;font-family:monospace;color:var(--usdt);word-break:break-all}
 .atualizacao{text-align:right;font-size:11px;color:var(--cinza);margin-top:20px}
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr};.saldo-total-valor{font-size:24px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 </head>
@@ -40,16 +46,16 @@ canvas{width:100%!important;height:100%!important}
   <div class="top-bar">
     <div class="token-info">
       <div class="logo"><img src="https://coffee-decisive-puma-198.mypinata.cloud/ipfs/bafybeifombxsbri6li35g4s6rtk6zv5rvjbuadhbgzztxbalab5nlsypua" alt="USDT"></div>
-      <div><h1>USDT</h1><p style="font-size:12px;color:var(--cinza)">Tether · Preço em Tempo Real</p></div>
+      <div><h1>USDT · Tether</h1><p style="font-size:12px;color:var(--cinza)">Seu Token · Ethereum</p></div>
     </div>
     <div class="price-main">$ 1.0000 USD</div>
   </div>
 
   <div class="tabs">
-    <span class="tab">5m <span style="color:var(--verde)">+0,01%</span></span>
-    <span class="tab">1h <span style="color:var(--vermelho)">-0,03%</span></span>
-    <span class="tab">24h <span style="color:var(--vermelho)">-0,01%</span></span>
-    <span class="tab">7d <span style="color:var(--vermelho)">-0,12%</span></span>
+    <span class="tab">5m <span style="color:var(--verde)">+0.00%</span></span>
+    <span class="tab">1h <span style="color:var(--verde)">+0.00%</span></span>
+    <span class="tab">24h <span style="color:var(--verde)">+0.01%</span></span>
+    <span class="tab">7d <span style="color:var(--verde)">+0.02%</span></span>
   </div>
 
   <div class="time-tabs">
@@ -61,29 +67,48 @@ canvas{width:100%!important;height:100%!important}
 
   <div class="grafico"><canvas id="graficoToken"></canvas></div>
 
-  <div class="saldo">
-    <div style="font-size:12px;color:var(--cinza);margin-bottom:6px">💰 Saldo da Carteira</div>
-    <div class="saldo-valor">35.000.000,00 USDT</div>
-    <div style="font-size:12px;color:var(--cinza);margin-top:4px">≈ $ 35.000.000,00 USD</div>
+  <!-- 💰 SALDO DA CARTEIRA -->
+  <div class="saldo-total">
+    <div class="saldo-total-titulo">💰 SALDO DA CARTEIRA</div>
+    <div class="saldo-total-valor">35.000.000,00 USDT</div>
+    <div style="font-size:16px;color:var(--verde)">≈ $ 35.000.000 USD</div>
+  </div>
+
+  <!-- 📋 DADOS DA CARTEIRA -->
+  <div class="carteiras-lista">
+    <div style="font-size:13px;color:var(--cinza);margin-bottom:12px">📋 Sua Carteira</div>
+    <div class="carteira-item">
+      <div>
+        <div class="carteira-nome">🔹 Carteira Principal</div>
+        <div class="carteira-end">0x26Ef6c3AF50240F211E774213914f8DB526fA77d</div>
+      </div>
+      <div class="carteira-saldo">35.000.000,00 USDT</div>
+    </div>
   </div>
 
   <div style="font-size:14px;color:var(--cinza);margin:20px 0 10px">📊 Estatísticas</div>
   <div class="grid">
     <div class="card"><div class="card-label">Supply Total</div><div class="card-valor">70.000.000 USDT</div></div>
-    <div class="card"><div class="card-label">Valor Mercado</div><div class="card-valor">$ 70.000.000,00 USD</div></div>
-    <div class="card"><div class="card-label">Preço</div><div class="card-valor">$ 1,00 USD</div></div>
-    <div class="card"><div class="card-label">Volume 24h</div><div class="card-valor">$ 1.250.000,00</div></div>
+    <div class="card"><div class="card-label">Valor de Mercado</div><div class="card-valor">$ 70.000.000</div></div>
+    <div class="card"><div class="card-label">Preço Atual</div><div class="card-valor">$ 1.0000 USD</div></div>
+    <div class="card"><div class="card-label">Volume 24h</div><div class="card-valor">$ 45.200.000</div></div>
   </div>
 
   <div style="font-size:14px;color:var(--cinza);margin:20px 0 10px">📁 Endereços</div>
-  <div class="endereco"><div class="endereco-titulo">🔹 CONTRATO USDT</div><div class="endereco-valor">0x4644E1113FE1a6bA831D85cc4772b3D0c23DE655</div></div>
-  <div class="endereco"><div class="endereco-titulo">🔹 SUA CARTEIRA</div><div class="endereco-valor">0x26Ef6c3AF50240F211E774213914f8DB526fA77d</div></div>
+  <div class="endereco"><div class="endereco-titulo">🔹 SEU TOKEN</div><div class="endereco-valor">0x4644E1113FE1a6bA831D85cc4772b3D0c23DE655</div></div>
+  <div class="endereco"><div class="endereco-titulo">🔹 CARTEIRA PRINCIPAL</div><div class="endereco-valor">0x26Ef6c3AF50240F211E774213914f8DB526fA77d</div></div>
 
   <div class="atualizacao">Última atualização: <span id="horaAtual"></span></div>
 </div>
 
 <script>
-document.getElementById('horaAtual').textContent = new Date().toLocaleTimeString('pt-BR');
+// Atualiza horário
+function atualizarHora() {
+  document.getElementById('horaAtual').textContent = new Date().toLocaleTimeString('pt-BR');
+}
+atualizarHora();
+
+// Gráfico
 const ctx = document.getElementById('graficoToken').getContext('2d');
 const pontos = 60;
 const labels = Array.from({length:pontos},(_,i)=>{
@@ -92,10 +117,35 @@ const labels = Array.from({length:pontos},(_,i)=>{
 });
 let valor = 1.0000;
 const dados = Array.from({length:pontos},()=>{
-  valor += (Math.random()-0.5)*0.001;
-  return Math.max(0.9990, Math.min(1.0010, valor));
+  valor += (Math.random()-0.5)*0.0005;
+  return Math.max(0.9995, Math.min(1.0005, valor));
 });
-new Chart(ctx,{type:'line',data:{labels:labels,datasets:[{label:'USDT/USD',data:dados,borderColor:'#26A17B',backgroundColor:'rgba(38,161,123,0.15)',fill:true,tension:0.4,borderWidth:2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#26A17B',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#2B3139',titleColor:'#EAECEF',bodyColor:'#EAECEF',borderColor:'#3D4451',borderWidth:1,padding:10,cornerRadius:6,callbacks:{label:c=>'Preço: $'+c.raw.toFixed(4)+' USD'}}},scales:{x:{grid:{color:'#222630',drawBorder:false},ticks:{color:'#848E9C',maxRotation:0,autoSkip:true,maxTicksLimit:10}},y:{min:0.9990,max:1.0010,grid:{color:'#222630',drawBorder:false},ticks:{color:'#848E9C',callback:v=>'$'+v.toFixed(4)}}}}});
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'USDT/USD',
+      data: dados,
+      borderColor: '#089981',
+      backgroundColor: 'rgba(8,153,129,0.15)',
+      fill: true,
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color:'#222630',drawBorder:false }, ticks:{color:'#848E9C',maxRotation:0,maxTicksLimit:10} },
+      y: { min:0.9995, max:1.0005, grid:{color:'#222630',drawBorder:false}, ticks:{color:'#848E9C',callback:v=>'$'+v.toFixed(4)} }
+    }
+  }
+});
 </script>
 </body>
 </html>
