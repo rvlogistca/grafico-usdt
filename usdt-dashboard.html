@@ -25,7 +25,7 @@ body{background:var(--bg);color:#EAECEF;font-family:sans-serif;padding:16px}
 .tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto}
 .tab{padding:6px 12px;border-radius:4px;font-size:13px;background:var(--bg2);color:var(--cinza);white-space:nowrap}
 .time-tabs{display:flex;gap:16px;margin-bottom:16px;border-bottom:1px solid var(--borda)}
-.time-tab{padding:8px 4px;font-size:14px;color:var(--cinza);border-bottom:2px solid transparent}
+.time-tab{padding:8px 4px;font-size:14px;color:var(--cinza);border-bottom:2px solid transparent;cursor:pointer}
 .time-tab.active{color:var(--verde);border-bottom:2px solid var(--verde)}
 .grafico{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:16px;margin-bottom:16px;height:350px}
 canvas{width:100%!important;height:100%!important}
@@ -59,10 +59,10 @@ canvas{width:100%!important;height:100%!important}
   </div>
 
   <div class="time-tabs">
-    <span class="time-tab active">1H</span>
-    <span class="time-tab">24H</span>
-    <span class="time-tab">7D</span>
-    <span class="time-tab">30D</span>
+    <span class="time-tab active" data-period="1H">1H</span>
+    <span class="time-tab" data-period="24H">24H</span>
+    <span class="time-tab" data-period="7D">7D</span>
+    <span class="time-tab" data-period="30D">30D</span>
   </div>
 
   <div class="grafico"><canvas id="graficoToken"></canvas></div>
@@ -108,43 +108,91 @@ function atualizarHora() {
 }
 atualizarHora();
 
-// Gráfico
-const ctx = document.getElementById('graficoToken').getContext('2d');
-const pontos = 60;
-const labels = Array.from({length:pontos},(_,i)=>{
-  const d = new Date(); d.setMinutes(d.getMinutes()-(pontos-1-i));
-  return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-});
-let valor = 1.0000;
-const dados = Array.from({length:pontos},()=>{
-  valor += (Math.random()-0.5)*0.0005;
-  return Math.max(0.9995, Math.min(1.0005, valor));
-});
-
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: 'USDT/USD',
-      data: dados,
-      borderColor: '#089981',
-      backgroundColor: 'rgba(8,153,129,0.15)',
-      fill: true,
-      borderWidth: 2,
-      pointRadius: 0,
-      tension: 0.4
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { color:'#222630',drawBorder:false }, ticks:{color:'#848E9C',maxRotation:0,maxTicksLimit:10} },
-      y: { min:0.9995, max:1.0005, grid:{color:'#222630',drawBorder:false}, ticks:{color:'#848E9C',callback:v=>'$'+v.toFixed(4)} }
-    }
+// Função para gerar dados do gráfico conforme período
+function gerarDados(periodo) {
+  let pontos, unidade;
+  switch(periodo) {
+    case '1H': pontos = 60; unidade = 'minute'; break;
+    case '24H': pontos = 96; unidade = 'hour'; break;
+    case '7D': pontos = 168; unidade = 'hour'; break;
+    case '30D': pontos = 30; unidade = 'day'; break;
+    default: pontos = 60; unidade = 'minute';
   }
+  
+  const labels = Array.from({length: pontos}, (_, i) => {
+    const d = new Date();
+    if (unidade === 'minute') d.setMinutes(d.getMinutes() - (pontos - 1 - i));
+    else if (unidade === 'hour') d.setHours(d.getHours() - (pontos - 1 - i));
+    else if (unidade === 'day') d.setDate(d.getDate() - (pontos - 1 - i));
+    
+    if (unidade === 'minute') return d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    if (unidade === 'hour') return `${d.getHours()}:00`;
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+  });
+  
+  let valor = 1.0000;
+  const minVar = 0.9995, maxVar = 1.0005;
+  const dados = Array.from({length: pontos}, () => {
+    valor += (Math.random() - 0.5) * 0.0008;
+    return Math.max(minVar, Math.min(maxVar, valor));
+  });
+  
+  return { labels, dados, min: minVar, max: maxVar };
+}
+
+// Inicializa gráfico
+const ctx = document.getElementById('graficoToken').getContext('2d');
+let chart;
+
+function criarGrafico(periodo) {
+  const { labels, dados, min, max } = gerarDados(periodo);
+  
+  if (chart) chart.destroy();
+  
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'USDT/USD',
+        data: dados,
+        borderColor: '#089981',
+        backgroundColor: 'rgba(8,153,129,0.15)',
+        fill: true,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { 
+          grid: { color:'#222630', drawBorder:false }, 
+          ticks:{color:'#848E9C', maxRotation:0, maxTicksLimit:10} 
+        },
+        y: { 
+          min: min, 
+          max: max, 
+          grid:{color:'#222630', drawBorder:false}, 
+          ticks:{color:'#848E9C', callback:v=>'$'+v.toFixed(4)} 
+        }
+      }
+    }
+  });
+}
+
+criarGrafico('1H');
+
+// Troca de período
+document.querySelectorAll('.time-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.time-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    criarGrafico(tab.dataset.period);
+  });
 });
 </script>
 </body>
